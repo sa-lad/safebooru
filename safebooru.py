@@ -11,6 +11,7 @@ TODO: word this description better :P
 from urllib import request
 from dataclasses import dataclass
 from json import loads
+from os import path, makedirs
 from argparse import ArgumentParser
 
 
@@ -18,6 +19,10 @@ class Request:
     """
     Request handler used to send requests and receive responses in text/json format.
     """
+    _BASE_URL = "https://safebooru.org/"
+    _API_URL = "index.php?page=dapi&s=post&q=index&json=1"
+    _IMG_URL = f"{_BASE_URL}/images/"
+
     @staticmethod
     def get(url: str, timeout: float=10.0) -> str:
         """
@@ -50,11 +55,7 @@ class Post(Request):
     """
     For interacting with a post made on safebooru.org using an to search with ID.
     """
-    post_id: int = 0
-
-    _BASE_URL = "https://safebooru.org/"
-    _API_URL = "index.php?page=dapi&s=post&q=index&json=1"
-    _IMG_URL = f"{_BASE_URL}/images/"
+    post_id: int
 
     @property
     def url(self) -> str:
@@ -62,6 +63,8 @@ class Post(Request):
         if self.post_id > 0:
             params += f"&id={self.post_id}"
             return request.urljoin(base=self._BASE_URL, url=params)
+        else:
+            raise Warning("Please make sure the ID is above 0")
 
     @property
     def img(self) -> str:
@@ -122,21 +125,94 @@ class Post(Request):
     def score(self) -> int | None:
         return self.json(self.url)[0]["score"]
 
-    def download(self, directory: str="./"):
+    def download(self, directory: str="./") -> bytes:
         with open(f"{directory}/{self.img}", "wb") as image_file:
             image_file.write(self.get(self.img_url))
+
+
+@dataclass
+class Tags(Request):
+    tags: str
+    pid: int = 0
+
+    @property
+    def url_tags(self) -> str:
+        params = Post._API_URL
+        if self.tags != "" and self.pid > -1:
+            params += f"&tags={self.tags}&pid={self.pid}"
+            return request.urljoin(base=Post._BASE_URL, url=params)
+        else:
+            raise Warning("Make sure the page is above 0 and the tags are valid")
+
+    def get_post(self, number: int) -> dict:
+        """
+        Get a specific post on the returned page. This will return the json
+        content of said post.
+
+        Example
+        -------
+        ```
+        tags = Tags(tags="serial_experiments_lain", pid=1)
+        print(tags.get_post(number=3))  # Json for 4th post on page (index 0-99).
+        ```
+        """
+        return self.json(url=self.url_tags)[number]
+
+    def download(self, number, directory: str="./") -> bytes:
+        """
+        Download a specific post of the the page.
+
+        Example
+        -------
+        ```
+        tags = Tags(tags="serial_experiments_lain", pid=1)
+        tags.download(number=4)  # Download the 5th image on page (index 0-99)
+        ```
+        """
+        post = Post(post_id=self.get_post(number)["id"])
+        with open(f"{directory}/{post.img}", "wb") as image_file:
+            image_file.write(self.get(post.img_url))
+
+    def download_all(self, directory: str="") -> bytes:
+        """
+        Download all of the posts on a page.
+
+        Example
+        -------
+        ```
+        tags = Tags(tags="serial_experiments_lain", pid=1)
+        tags.download_all(directory="./foo")  # Download page into custom dir.
+        ```
+        """
+        count = 0
+        if directory == "":
+            directory = f"./page_{self.pid}"
+        if path.exists(directory) is False:
+            makedirs(directory)
+        for _ in self.json(url=self.url_tags):
+            self.download(number=count, directory=directory)
+            count += 1
 
 def main():
     # CLI.
     parser = ArgumentParser()
     parser.add_argument("-i", "--id", help="post ID to use", type=int)
+    parser.add_argument("-t", "--tags", help="tags to use in query", type=str)
+    parser.add_argument("-p", "--page", help="page to download from", type=int)
+    parser.add_argument("-n", "--num", help="post number to download", type=int)
     args = parser.parse_args()
 
     if args.id is not None:
         post = Post(post_id=args.id)
         post.download()
+    elif args.tags is not None and args.page is not None:
+        tags = Tags(tags=args.tags, pid=args.page)
+        if args.num is not None:
+            tags.download(number=args.num)
+            exit()
+        tags.download_all()
 
-    # Methods & property testing (too lazy for unittesting this).
+    # Post testing (too lazy for unittesting this).
     #post = Post(post_id=3664652)
     #print(post.url)
     #print(post.json(post.url))
@@ -155,6 +231,13 @@ def main():
     #print(post.sample_width)
     #print(post.score)
     #post.download()
+
+    # Tags testing.
+    #tags = Tags(tags="serial_experiments_lain", pid=1)
+    #print(tags.url_tags)
+    #print(tags.get_post(number=3))
+    #tags.download(number=4)
+    #tags.download_all()
 
 if __name__ == "__main__":
     main()
