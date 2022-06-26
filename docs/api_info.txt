@@ -1,0 +1,40 @@
+API Basics
+==========
+
+Source: https://safebooru.org/index.php?page=help&topic=dapi
+
+You should never receive an error unless the server is overloaded or the search dies.
+In cases of the searcher breaking, you will receive a response success of"false" and a
+message stating "search down" or similiar.
+
+
+Posts
+-----
+
+(List)
+
+Url for API access: /index.php?page=dapi&s=post&q=index
+
+- limit   How many posts you want to retrieve. There is a hard limit of 100 posts per request.
+- pid     The page number.
+- tags    The tags to search for. Any tag combination that works on the web site will work here.
+          This includes all the meta-tags. See cheatsheet for more information.
+- cid     Change ID of the post. This is in Unix time so there are likely others with the same
+          value if updated at the same time.
+- id      The post id.
+
+(Deleted Images)
+
+Url for API access: /index.php?page=dapi&s=post&q=index&deleted=show
+
+- last_id   A numerical value. Will return everything above this number.
+
+
+Comments
+--------
+
+(List)
+
+Url for API access: /index.php?page=dapi&s=comment&q=index
+
+- post_id   The id number of the comment to retrieve.
