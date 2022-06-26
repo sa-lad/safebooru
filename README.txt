@@ -1,9 +1,10 @@
 Safebooru Post Grabber
 ======================
 
-I intend on doing more with this tool in the future, I will most likely add
-the ability to search with tags/ pid/ limit, but at this moment in time the
-tool basically just downloads an image from the post ID that is entered.
+This tool can download/ grab information about a post using it's ID.
+It can also do the above, but using tags and the page number instead.
+Using tags and page number, you can choose to download a specific
+post on the page or [and] download every single post on that page.
 
 
 How to Use
