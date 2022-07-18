@@ -49,6 +49,18 @@ class Request:
         except:
             raise TimeoutError("Failed to get json response from safebooru.org")
 
+    @staticmethod
+    def ping(url: str, timeout: float=10.0) -> int:
+        """
+        Ping safebooru.org/ attempt test connection.
+        Once connection is made, return status code of response.
+        """
+        try:
+            with request.urlopen(url=url, timeout=timeout) as response:
+                return response.getcode()
+        except:
+            raise TimeoutError("Failed to ping safebooru.org")
+
 
 @dataclass
 class Post(Request):
@@ -215,6 +227,7 @@ def main():
     # Post testing (too lazy for unittesting this).
     #post = Post(post_id=3664652)
     #print(post.url)
+    #print(post.ping(post.url))
     #print(post.json(post.url))
     #print(post.img)
     #print(post.img_directory)
