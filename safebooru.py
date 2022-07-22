@@ -138,6 +138,10 @@ class Post(Request):
         return self.json(self.url)[0]["score"]
 
     def download(self, directory: str="./") -> bytes:
+        if directory == "":
+            directory = f"./"
+        if path.exists(directory) is False:
+            makedirs(directory)
         with open(f"{directory}/{self.img}", "wb") as image_file:
             image_file.write(self.get(self.img_url))
 
@@ -170,7 +174,7 @@ class Tags(Request):
         """
         return self.json(url=self.url_tags)[number]
 
-    def download(self, number, directory: str="./") -> bytes:
+    def download(self, number: int, directory: str="./") -> bytes:
         """
         Download a specific post of the the page.
 
@@ -181,6 +185,10 @@ class Tags(Request):
         tags.download(number=4)  # Download the 5th image on page (index 0-99)
         ```
         """
+        if directory == "":
+            directory = f"./"
+        if path.exists(directory) is False:
+            makedirs(directory)
         post = Post(post_id=self.get_post(number)["id"])
         with open(f"{directory}/{post.img}", "wb") as image_file:
             image_file.write(self.get(post.img_url))
