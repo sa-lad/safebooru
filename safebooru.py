@@ -153,10 +153,10 @@ class Tags(Request):
 
     @property
     def url_tags(self) -> str:
-        params = Post._API_URL
+        params = self._API_URL
         if self.tags != "" and self.pid > -1:
             params += f"&tags={self.tags}&pid={self.pid}"
-            return request.urljoin(base=Post._BASE_URL, url=params)
+            return request.urljoin(base=self._BASE_URL, url=params)
         else:
             raise Warning("Make sure the page is above 0 and the tags are valid")
 
