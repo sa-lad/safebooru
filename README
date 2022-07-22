@@ -10,10 +10,8 @@ post on the page or [and] download every single post on that page.
 How to Use
 ----------
 
-Either edit `main()` at the bottom of safebooru.py directly -
-
-
-< Or >
+Either edit `main()` at the bottom of safebooru.py directly
+or by the command line using the below commands.
 
 
 Download using ID:
