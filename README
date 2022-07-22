@@ -24,3 +24,7 @@ Download using tags and page:
 
     # To download a specific post on this page.
     $ python safebooru.py -t "serial_experiments_lain" -p 2 -n 3
+
+Download (either) with customer directory:
+
+    $ python safebooru.py -i 273 -d "./example_dir"
