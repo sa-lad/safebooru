@@ -220,15 +220,20 @@ def main():
     parser.add_argument("-t", "--tags", help="tags to use in query", type=str)
     parser.add_argument("-p", "--page", help="page to download from", type=int)
     parser.add_argument("-n", "--num", help="post number to download", type=int)
+    parser.add_argument("-d", "--dir", help="directory for download", type=str)
     args = parser.parse_args()
 
+    if args.dir is not None:
+        arg_dir = args.dir
+    elif args.dir is None:
+        arg_dir = ""
     if args.id is not None:
         post = Post(post_id=args.id)
-        post.download()
+        post.download(directory=arg_dir)
     elif args.tags is not None and args.page is not None:
         tags = Tags(tags=args.tags, pid=args.page)
         if args.num is not None:
-            tags.download(number=args.num)
+            tags.download(number=args.num, directory=arg_dir)
             exit()
         tags.download_all()
 
