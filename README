@@ -12,11 +12,14 @@ How to Use
 
 Either edit `main()` at the bottom of safebooru.py directly -
 
-Or
+
+< Or >
+
 
 Download using ID:
 
     $ python safebooru.py -i 3664652
+
 
 Download using tags and page:
 
@@ -24,6 +27,7 @@ Download using tags and page:
 
     # To download a specific post on this page.
     $ python safebooru.py -t "serial_experiments_lain" -p 2 -n 3
+
 
 Download (either) with customer directory:
 
